@@ -57,21 +57,21 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data['state'] = MAIN_MENU
     context.user_data['stats'] = {'reputation': 0, 'health': 100}
 
+    # Используем description из game_data[1] как стартовое сообщение
+    chapter = game_data[1]
     await update.message.reply_text(
-        f"Добро пожаловать, {user.first_name}, в историческую новеллу '1812'!\n\n"
-        "Вы окажетесь в гуще событий Отечественной войны 1812 года.",
+        text=f"🟥 {chapter['title']}\n\n{chapter['description']}",
+        parse_mode='HTML',
         reply_markup=main_menu_keyboard()
     )
-
 
 def main_menu_keyboard():
     """Клавиатура главного меню"""
     keyboard = [
-        [InlineKeyboardButton("Начать игру", callback_data='new_game')],
-        [InlineKeyboardButton("Выбрать главу", callback_data='select_chapter')]
+        [InlineKeyboardButton("➡️ Начать игру", callback_data='new_game')],
+        [InlineKeyboardButton("📜 Историческая справка", callback_data='select_chapter')]
     ]
     return InlineKeyboardMarkup(keyboard)
-
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Обработчик кнопок"""
@@ -165,7 +165,7 @@ async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 def main() -> None:
     """Запуск приложения"""
-    application = Application.builder().token("BOT_TOKEN").build()
+    application = Application.builder().token(os.getenv("TELEGRAM_TOKEN")).build()
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(button_handler, pattern='^new_game|select_chapter$'))
