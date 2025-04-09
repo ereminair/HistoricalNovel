@@ -9,17 +9,14 @@ from telegram.ext import (
 )
 import logging
 
-# Настройка логирования
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
-# Состояния игры
 (MAIN_MENU, CHAPTER_SELECTION, PLAYING_CHAPTER) = range(3)
 
-# Данные игры
 game_data = {
     1: {
         "title": "Начало пути: 1812 год",
@@ -38,7 +35,6 @@ game_data = {
 }
 
 
-# ========== ОБРАБОТЧИКИ КОМАНД ==========
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Главное меню"""
     user = update.message.from_user
@@ -124,11 +120,9 @@ async def handle_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     chapter = game_data[context.user_data['current_chapter']]
     choice = chapter['choices'][choice_idx]
 
-    # Обновляем статистику
     for stat, value in choice['effects'].items():
         context.user_data['stats'][stat] = context.user_data['stats'].get(stat, 0) + value
 
-    # Переходим к следующей сцене
     next_scene = choice['next_scene']
     if next_scene < len(chapter['scenes']):
         await query.edit_message_text(
@@ -154,20 +148,16 @@ async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     )
 
 
-# ========== ЗАПУСК БОТА ==========
 def main() -> None:
     """Запуск приложения"""
-    # ЗАМЕНИТЕ НА ВАШ ТОКЕН (получите у @BotFather)
     application = Application.builder().token("7585196961:AAF6MP7zv14VMBalVPVpQ6O_k3P6FDzuonQ").build()
 
-    # Обработчики команд
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(button_handler, pattern='^new_game|select_chapter$'))
     application.add_handler(CallbackQueryHandler(handle_choice, pattern='^choice_'))
     application.add_handler(CallbackQueryHandler(back_to_main, pattern='^back_to_main$'))
     application.add_handler(CallbackQueryHandler(start_chapter, pattern='^chapter_'))
 
-    # Запуск бота
     application.run_polling()
 
 
