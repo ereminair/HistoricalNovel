@@ -1,3 +1,6 @@
+import os
+from email.mime import application
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
@@ -8,6 +11,8 @@ from telegram.ext import (
     filters
 )
 import logging
+from dotenv import load_dotenv
+load_dotenv()  # Загружает переменные из .env
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -163,7 +168,7 @@ async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 def main() -> None:
     """Запуск приложения"""
-    application = Application.builder().token("7585196961:AAF6MP7zv14VMBalVPVpQ6O_k3P6FDzuonQ").build()
+    application = Application.builder().token("BOT_TOKEN").build()
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(button_handler, pattern='^new_game|select_chapter$'))
@@ -175,4 +180,8 @@ def main() -> None:
 
 
 if __name__ == '__main__':
+    if not os.getenv("DEV_MODE"):
+        application.run_webhook()  # Продакшен-режим
+    else:
+        application.run_polling()
     main()
