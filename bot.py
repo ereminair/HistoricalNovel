@@ -1,6 +1,4 @@
 import os
-from email.mime import application
-
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
@@ -165,7 +163,6 @@ async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         reply_markup=main_menu_keyboard()
     )
 
-
 def main() -> None:
     """Запуск приложения"""
     application = Application.builder().token("BOT_TOKEN").build()
@@ -176,12 +173,11 @@ def main() -> None:
     application.add_handler(CallbackQueryHandler(back_to_main, pattern='^back_to_main$'))
     application.add_handler(CallbackQueryHandler(start_chapter, pattern='^chapter_'))
 
-    application.run_polling()
-
+    # Перенесённый запуск бота
+    if not os.getenv("DEV_MODE"):
+        application.run_webhook()  # Продакшен
+    else:
+        application.run_polling()  # Разработка
 
 if __name__ == '__main__':
-    if not os.getenv("DEV_MODE"):
-        application.run_webhook()  # Продакшен-режим
-    else:
-        application.run_polling()
-    main()
+    main()  # Только один вызов main()
