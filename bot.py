@@ -99,12 +99,44 @@ game_data = {
             }
         ]
     },
+    4: {
+        "title": "Шпионский скандал (1946)",
+        "description": (
+            "Агенты ЦРУ пытаются украсть ядерные секреты СССР. Как реагировать на угрозу?"
+        ),
+        "choices": [
+            {
+                "text": "🕵️ Расстрелять всех подозреваемых!",
+                "effects": {
+                    "nuclear_research": +1,
+                    "economy": -1
+                },
+                "result": (
+                    "Программа замедляется из-за репрессий, но утечки прекращаются."
+                ),
+                "next_event": "Испытание РДС-1 (1949)"
+            },
+            {
+                "text": "🔄 Запустить дезинформацию",
+                "effects": {
+                    "europe_influence": +1,
+                    "us_relations": -2
+                },
+                "result": (
+                    "США тратят ресурсы на ложные цели, но усиливают разведку."
+                ),
+                "next_event": "Операция 'Венона' (1948)"
+            }
+        ]
+    },
+
     99: {
         "title": "📜 Историческая справка",
         "description": "Выберите историческое событие:",
         "choices": [
-            {"text": "Потсдамская конференция (1945)", "callback": "potsdam_conference"},
-            {"text": "Фултонская речь Черчилля (1946)", "callback": "churchill_speech"},
+            {"text": "Потсдамская конференция (1945)", "callback": "history_potsdam"},
+            {"text": "Фултонская речь Черчилля (1946)", "callback": "history_churchill"},
+            {"text": "Шпионский скандал (1946)", "callback": "history_spy"},
             {"text": "↩️ Назад", "callback": "back_to_main"}
         ]
     }
@@ -151,16 +183,71 @@ async def handle_potsdam_choice(update: Update, context: ContextTypes.DEFAULT_TY
     chapter = game_data[3]
     choice = chapter['choices'][choice_idx]
 
+    # Применяем эффекты
     for stat, value in choice['effects'].items():
         context.user_data['stats'][stat] = context.user_data['stats'].get(stat, 0) + value
 
+    if choice_idx == 0:  # Если выбрали "ускорить ядерную программу"
+        await show_spy_scandal(update, context)
+    else:
+        # Стандартный результат для других выборов
+        result_message = (
+            f"<b>Результат:</b>\n{choice['result']}\n\n"
+            f"<b>Следующее событие:</b> {choice['next_event']}\n\n"
+            f"<b>Текущие показатели:</b>\n"
+            f"⚔️ Военная мощь: {context.user_data['stats'].get('military', 0)}\n"
+            f"🏭 Экономика: {context.user_data['stats'].get('economy', 0)}\n"
+            f"☢️ Ядерные исследования: {context.user_data['stats'].get('nuclear_research', 0)}\n"
+            f"🌍 Влияние в Европе: {context.user_data['stats'].get('europe_influence', 0)}\n"
+            f"🇺🇸 Отношения с США: {context.user_data['stats'].get('us_relations', 0)}"
+        )
+
+        await query.edit_message_text(
+            text=result_message,
+            parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("➡️ Продолжить", callback_data=choice['next_event'].lower().replace(" ", "_"))],
+                [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+            ])
+        )
+
+
+async def show_spy_scandal(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Показывает сценарий шпионского скандала"""
+    chapter = game_data[4]
+    keyboard = [
+        [InlineKeyboardButton(choice["text"], callback_data=f"spy_choice_{i}")]
+        for i, choice in enumerate(chapter['choices'])
+    ]
+    keyboard.append([InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')])
+
+    await update.callback_query.edit_message_text(
+        text=f"<b>{chapter['title']}</b>\n\n{chapter['description']}",
+        parse_mode='HTML',
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+
+async def handle_spy_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Обрабатывает выбор в шпионском скандале"""
+    query = update.callback_query
+    await query.answer()
+
+    choice_idx = int(query.data.split('_')[-1])
+    chapter = game_data[4]
+    choice = chapter['choices'][choice_idx]
+
+    # Применяем эффекты
+    for stat, value in choice['effects'].items():
+        context.user_data['stats'][stat] = context.user_data['stats'].get(stat, 0) + value
+
+    # Формируем сообщение
     result_message = (
         f"<b>Результат:</b>\n{choice['result']}\n\n"
         f"<b>Следующее событие:</b> {choice['next_event']}\n\n"
         f"<b>Текущие показатели:</b>\n"
-        f"⚔️ Военная мощь: {context.user_data['stats'].get('military', 0)}\n"
-        f"🏭 Экономика: {context.user_data['stats'].get('economy', 0)}\n"
         f"☢️ Ядерные исследования: {context.user_data['stats'].get('nuclear_research', 0)}\n"
+        f"🏭 Экономика: {context.user_data['stats'].get('economy', 0)}\n"
         f"🌍 Влияние в Европе: {context.user_data['stats'].get('europe_influence', 0)}\n"
         f"🇺🇸 Отношения с США: {context.user_data['stats'].get('us_relations', 0)}"
     )
@@ -173,6 +260,7 @@ async def handle_potsdam_choice(update: Update, context: ContextTypes.DEFAULT_TY
             [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
         ])
     )
+
 
 async def show_history_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Показывает меню исторических справок"""
@@ -198,6 +286,61 @@ async def handle_churchill_choice(update: Update, context: ContextTypes.DEFAULT_
 
     await show_potsdam_conference(update, context)
 
+async def show_churchill_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    text = (
+        "<b>Фултонская речь Черчилля (1946)</b>\n\n"
+        "В марте 1946 года в небольшом городке Фултон (штат Миссури, США) "
+        "Уинстон Черчилль произнёс знаменитую речь, в которой предупредил об угрозе, "
+        "исходящей от Советского Союза, и упомянул о 'железном занавесе', "
+        "разделяющем Восточную и Западную Европу. Эта речь стала символическим началом Холодной войны."
+    )
+
+    await update.callback_query.edit_message_text(
+        text=text,
+        parse_mode='HTML',
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
+            [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+        ])
+    )
+
+async def show_potsdam_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    text = (
+        "<b>Потсдамская конференция (1945)</b>\n\n"
+        "Летом 1945 года лидеры СССР, США и Великобритании собрались в Потсдаме, чтобы "
+        "решить судьбу послевоенного мира. Конференция определила новые границы Германии, "
+        "программу её демилитаризации и репарации. В это же время США сообщили о создании атомной бомбы, "
+        "что усилило напряжение между союзниками."
+    )
+
+    await update.callback_query.edit_message_text(
+        text=text,
+        parse_mode='HTML',
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
+            [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+        ])
+    )
+
+
+async def show_spy_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    text = (
+        "<b>Шпионский скандал (1946)</b>\n\n"
+        "После окончания Второй мировой войны США начали активно собирать разведданные о "
+        "ядерной программе СССР. В ответ советские органы безопасности усилили контроль, "
+        "расследования и запустили операции дезинформации. Этот скрытый конфликт повлиял на "
+        "гонку ядерных вооружений и отношения двух сверхдержав."
+    )
+
+    await update.callback_query.edit_message_text(
+        text=text,
+        parse_mode='HTML',
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
+            [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+        ])
+    )
+
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Обработчик кнопок"""
@@ -214,10 +357,18 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await show_potsdam_conference(update, context)
     elif query.data == 'churchill_speech':
         await show_churchill_scene(update, context)
+    elif query.data == 'history_spy':
+        await show_spy_history(update, context)
+    elif query.data == 'history_churchill':
+        await show_churchill_history(update, context)
+    elif query.data == 'history_potsdam':
+        await show_potsdam_history(update, context)
     elif query.data.startswith('choice_churchill_'):
         await handle_churchill_choice(update, context)
     elif query.data.startswith('choice_'):
         await handle_potsdam_choice(update, context)
+    elif query.data.startswith('spy_choice_'):
+        await handle_spy_choice(update, context)
 
 
 async def show_welcome(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
