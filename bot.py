@@ -1,4 +1,6 @@
 import os
+from lib2to3.fixes.fix_input import context
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
@@ -129,7 +131,37 @@ game_data = {
             }
         ]
     },
-
+    5: {
+        "title": "Берлинский кризис (1948)",
+        "description": (
+            "Западные союзники вводят новую валюту в Западном Берлине. "
+            "Как ответить на этот вызов?"
+        ),
+        "choices": [
+            {
+                "text": "🚧 Блокировать город!",
+                "effects": {
+                    "military": +2,
+                    "economy": -1
+                },
+                "check": lambda stats: stats.get('europe_influence', 0) >= 0,
+                "result": (
+                    "Вы вводите блокаду Западного Берлина. "
+                    "{}"
+                ),
+                "next_event": "Создание НАТО (1949)"
+            },
+            {
+                "text": "💣 Угрожать ядерным ударом",
+                "effects": {
+                    "nuclear_research": +3,
+                    "us_relations": -5
+                },
+                "result": "Трумэн выдвигает ультиматум. Начинается ранний Карибский кризис.",
+                "next_event": "Карибский кризис (1950)"
+            }
+        ]
+    },
     99: {
         "title": "📜 Историческая справка",
         "description": "Выберите историческое событие:",
@@ -137,6 +169,8 @@ game_data = {
             {"text": "Потсдамская конференция (1945)", "callback": "history_potsdam"},
             {"text": "Фултонская речь Черчилля (1946)", "callback": "history_churchill"},
             {"text": "Шпионский скандал (1946)", "callback": "history_spy"},
+            {"text": "Берлинский кризис (1948)", "callback": "history_berlin"},
+
             {"text": "↩️ Назад", "callback": "back_to_main"}
         ]
     }
@@ -187,21 +221,16 @@ async def handle_potsdam_choice(update: Update, context: ContextTypes.DEFAULT_TY
     for stat, value in choice['effects'].items():
         context.user_data['stats'][stat] = context.user_data['stats'].get(stat, 0) + value
 
-    if choice_idx == 0:  # Если выбрали "ускорить ядерную программу"
+    # Сохраняем последний выбор
+    context.user_data['last_choice'] = choice_idx
+
+    if choice_idx == 1:  # Если выбрали "Укрепить контроль в Восточной Европе"
+        await show_berlin_crisis(update, context)
+    elif choice_idx == 0:  # Ядерная программа
         await show_spy_scandal(update, context)
     else:
-        # Стандартный результат для других выборов
-        result_message = (
-            f"<b>Результат:</b>\n{choice['result']}\n\n"
-            f"<b>Следующее событие:</b> {choice['next_event']}\n\n"
-            f"<b>Текущие показатели:</b>\n"
-            f"⚔️ Военная мощь: {context.user_data['stats'].get('military', 0)}\n"
-            f"🏭 Экономика: {context.user_data['stats'].get('economy', 0)}\n"
-            f"☢️ Ядерные исследования: {context.user_data['stats'].get('nuclear_research', 0)}\n"
-            f"🌍 Влияние в Европе: {context.user_data['stats'].get('europe_influence', 0)}\n"
-            f"🇺🇸 Отношения с США: {context.user_data['stats'].get('us_relations', 0)}"
-        )
-
+        # Стандартная обработка
+        result_message = f"<b>Результат:</b>\n{choice['result']}\n\n..."
         await query.edit_message_text(
             text=result_message,
             parse_mode='HTML',
@@ -210,6 +239,86 @@ async def handle_potsdam_choice(update: Update, context: ContextTypes.DEFAULT_TY
                 [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
             ])
         )
+
+
+async def show_berlin_crisis(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Показывает сценарий Берлинского кризиса"""
+    chapter = game_data[5]
+    keyboard = []
+
+    for i, choice in enumerate(chapter['choices']):
+        # Проверяем условия для кнопки (если есть)
+        if 'check' in choice:
+            if choice['check'](context.user_data['stats']):
+                keyboard.append([InlineKeyboardButton(choice["text"], callback_data=f"berlin_choice_{i}")])
+        else:
+            keyboard.append([InlineKeyboardButton(choice["text"], callback_data=f"berlin_choice_{i}")])
+
+    keyboard.append([InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')])
+
+    await update.callback_query.edit_message_text(
+        text=f"<b>{chapter['title']}</b>\n\n{chapter['description']}",
+        parse_mode='HTML',
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+async def show_berlin_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    text = (
+        "<b>Берлинский кризис (1948)</b>\n\n"
+        "В 1948 году СССР начал блокаду Западного Берлина, пытаясь вынудить западные державы отказаться "
+        "от своих планов по объединению западных зон Германии. В ответ США и их союзники организовали "
+        "воздушный мост, снабжая город продовольствием и топливом. Блокада провалилась, и кризис стал "
+        "одним из первых острых моментов Холодной войны."
+    )
+
+    await update.callback_query.edit_message_text(
+        text=text,
+        parse_mode='HTML',
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
+            [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+        ])
+    )
+
+
+async def handle_berlin_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Обрабатывает выбор в Берлинском кризисе"""
+    query = update.callback_query
+    await query.answer()
+
+    choice_idx = int(query.data.split('_')[-1])
+    chapter = game_data[5]
+    choice = chapter['choices'][choice_idx]
+
+    # Применяем эффекты
+    for stat, value in choice['effects'].items():
+        context.user_data['stats'][stat] = context.user_data['stats'].get(stat, 0) + value
+
+    # Формируем текст результата
+    result_text = choice['result'].format('Запад отвечает воздушным мостом.')  # Здесь заполним {}, если есть
+
+    # Формируем сообщение с показателями
+    result_message = (
+        f"<b>Результат:</b>\n{result_text}\n\n"
+        f"<b>Следующее событие:</b> {choice['next_event']}\n\n"
+        f"<b>Текущие показатели:</b>\n"
+        f"⚔️ Военная мощь: {context.user_data['stats'].get('military', 0)}\n"
+        f"🏭 Экономика: {context.user_data['stats'].get('economy', 0)}\n"
+        f"☢️ Ядерные исследования: {context.user_data['stats'].get('nuclear_research', 0)}\n"
+        f"🌍 Влияние в Европе: {context.user_data['stats'].get('europe_influence', 0)}\n"
+        f"🇺🇸 Отношения с США: {context.user_data['stats'].get('us_relations', 0)}"
+    )
+
+    # Кнопки "Продолжить" и "Назад"
+    await query.edit_message_text(
+        text=result_message,
+        parse_mode='HTML',
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("➡️ Продолжить", callback_data=choice['next_event'].lower().replace(" ", "_"))],
+            [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+        ])
+    )
+
 
 
 async def show_spy_scandal(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -369,6 +478,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await handle_potsdam_choice(update, context)
     elif query.data.startswith('spy_choice_'):
         await handle_spy_choice(update, context)
+    elif query.data.startswith('berlin_choice_'):
+        await handle_berlin_choice(update, context)
+    elif query.data.startswith('history_berlin'):
+        await show_berlin_history(update, context)
+
 
 
 async def show_welcome(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
