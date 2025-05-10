@@ -127,7 +127,7 @@ game_data = {
                 "result": (
                     "США тратят ресурсы на ложные цели, но усиливают разведку."
                 ),
-                "next_event": "Операция 'Венона' (1948)"
+                "next_event": "операция_венона"
             }
         ]
     },
@@ -259,7 +259,41 @@ game_data = {
                     "Испытание держится в секрете, но вызывает сомнения у союзников. "
                     "Через 6 месяцев ЦРУ узнает правду, что снижает влияние СССР."
                 ),
-                "next_event": "Операция 'Венона' (1950)"
+                "next_event": "операция_венона"
+            }
+        ]
+    },
+    9: {
+        "title": "Операция 'Венона' (1948/1950)",
+        "description": (
+            "Американская разведка расшифровывает шифровки советских агентов. "
+            "Начинается масштабное разоблачение шпионской сети.\n\n"
+            "Как реагировать на утечку?"
+        ),
+        "choices": [
+            {
+                "text": "🔄 Замести следы",
+                "effects": {
+                    "europe_influence": +1,
+                    "economy": -1
+                },
+                "result": (
+                    "СССР перестраивает шифровальные системы, чтобы сохранить агентуру. "
+                    "Большинство агентов избегают разоблачения, но операция обходится дорого."
+                ),
+                "next_event": "Дело Розенбергов (1951)"
+            },
+            {
+                "text": "💀 Ликвидировать всех связанных",
+                "effects": {
+                    "us_relations": +2,
+                    "military": -1
+                },
+                "result": (
+                    "СССР уничтожает сеть шпионажа в США. "
+                    "Американцы теряют источники, но СССР теряет ценных учёных и инженеров."
+                ),
+                "next_event": "Отставание в гонке (1952)"
             }
         ]
     },
@@ -277,11 +311,24 @@ game_data = {
 
             {"text": "↩️ Назад", "callback": "back_to_main"}
         ]
+    },
+
+    "final_victory": {
+        "title": "🏆 Победа!",
+        "description": (
+            "🕯️ <b>Март 1953 года. Смерть Сталина</b>\n\n"
+            "Вы прожили судьбоносные годы во главе Советского Союза. "
+            "Холодная война в самом разгаре. Ваши решения определили его лицо.\n\n"
+            "<b>Игра завершена. История запомнит вас таким, каким вы были.</b>"
+        ),
+        "is_final": True
     }
+
 }
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Главное меню"""
+    context.user_data['year'] = 1945
     context.user_data['stats'] = {'reputation': 0, 'health': 100}
     chapter = game_data[1]
 
@@ -315,6 +362,16 @@ async def handle_churchill_choice(update: Update, context: ContextTypes.DEFAULT_
         context.user_data['stats'][stat] = context.user_data['stats'].get(stat, 0) + value
 
     await show_potsdam_conference(update, context)
+    # после применения эффектов
+    context.user_data['year'] += 1
+
+    if choice.get('is_final', False):
+        await show_final_screen(update, context, outcome_key="global_war")
+        return
+    if context.user_data['year'] >= 1953:
+        await show_final_screen(update, context, outcome_key="victory")
+        return
+
 
 async def show_churchill_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     text = (
@@ -396,6 +453,16 @@ async def handle_potsdam_choice(update: Update, context: ContextTypes.DEFAULT_TY
                 [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
             ])
         )
+    # после применения эффектов
+    context.user_data['year'] += 1
+
+    if choice.get('is_final', False):
+        await show_final_screen(update, context, outcome_key="global_war")
+        return
+    if context.user_data['year'] >= 1953:
+        await show_final_screen(update, context, outcome_key="victory")
+        return
+
 
 async def show_potsdam_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     text = (
@@ -467,6 +534,16 @@ async def handle_spy_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) 
             [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
         ])
     )
+    # после применения эффектов
+    context.user_data['year'] += 1
+
+    if choice.get('is_final', False):
+        await show_final_screen(update, context, outcome_key="global_war")
+        return
+    if context.user_data['year'] >= 1953:
+        await show_final_screen(update, context, outcome_key="victory")
+        return
+
 
 async def show_spy_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     text = (
@@ -564,6 +641,16 @@ async def handle_berlin_choice(update: Update, context: ContextTypes.DEFAULT_TYP
                 [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
             ])
         )
+    # после применения эффектов
+    context.user_data['year'] += 1
+
+    if choice.get('is_final', False):
+        await show_final_screen(update, context, outcome_key="global_war")
+        return
+    if context.user_data['year'] >= 1953:
+        await show_final_screen(update, context, outcome_key="victory")
+        return
+
 
 # Маршал
 async def show_marshall_plan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -611,6 +698,16 @@ async def handle_marshall_choice(update: Update, context: ContextTypes.DEFAULT_T
             [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
         ])
     )
+    # после применения эффектов
+    context.user_data['year'] += 1
+
+    if choice.get('is_final', False):
+        await show_final_screen(update, context, outcome_key="global_war")
+        return
+    if context.user_data['year'] >= 1953:
+        await show_final_screen(update, context, outcome_key="victory")
+        return
+
 
 # Кризис
 async def show_cuban_crisis(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -671,6 +768,16 @@ async def handle_cuban_choice(update: Update, context: ContextTypes.DEFAULT_TYPE
         parse_mode='HTML',
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
+    # после применения эффектов
+    context.user_data['year'] += 1
+
+    if choice.get('is_final', False):
+        await show_final_screen(update, context, outcome_key="global_war")
+        return
+    if context.user_data['year'] >= 1953:
+        await show_final_screen(update, context, outcome_key="victory")
+        return
+
 
 async def show_cuban_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     text = (
@@ -743,6 +850,16 @@ async def handle_rds1_choice(update: Update, context: ContextTypes.DEFAULT_TYPE)
             [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
         ])
     )
+    # после применения эффектов
+    context.user_data['year'] += 1
+
+    if choice.get('is_final', False):
+        await show_final_screen(update, context, outcome_key="global_war")
+        return
+    if context.user_data['year'] >= 1953:
+        await show_final_screen(update, context, outcome_key="victory")
+        return
+
 
 async def show_rds1_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     text = (
@@ -766,6 +883,54 @@ async def show_rds1_history(update: Update, context: ContextTypes.DEFAULT_TYPE) 
             [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
         ])
     )
+
+#Венона
+async def show_venona_operation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Сценарий Операции 'Венона'"""
+    chapter = game_data[9]
+    keyboard = [
+        [InlineKeyboardButton(choice["text"], callback_data=f"venona_choice_{i}")]
+        for i, choice in enumerate(chapter['choices'])
+    ]
+    keyboard.append([InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')])
+
+    await update.callback_query.edit_message_text(
+        text=f"<b>{chapter['title']}</b>\n\n{chapter['description']}",
+        parse_mode='HTML',
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+async def handle_venona_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+
+    choice_idx = int(query.data.split('_')[-1])
+    chapter = game_data[9]
+    choice = chapter['choices'][choice_idx]
+
+    apply_effects(context, choice['effects'])
+    context.user_data['year'] += 1
+
+    # Проверка на финал
+    if context.user_data['year'] >= 1953:
+        await show_final_screen(update, context, outcome_key="victory")
+        return
+
+    result_message = (
+        f"<b>Результат:</b>\n{choice['result']}\n\n"
+        f"<b>Следующее событие:</b> {choice['next_event']}\n\n"
+        f"<b>Текущие показатели:</b>\n{get_stats_display(context)}"
+    )
+
+    await query.edit_message_text(
+        text=result_message,
+        parse_mode='HTML',
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("➡️ Продолжить", callback_data=choice['next_event'].lower().replace(" ", "_"))],
+            [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+        ])
+    )
+
 
 async def show_history_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Показывает меню исторических справок"""
@@ -821,8 +986,46 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await show_rds1_test(update, context)
     elif query.data == 'history_rds1':
         await show_rds1_history(update, context)
+    elif query.data.startswith('venona_choice_'):
+        await handle_venona_choice(update, context)
+    elif query.data == 'операция_венона':
+        await show_venona_operation(update, context)
 
 
+def get_stats_display(context):
+    stats = context.user_data.get('stats', {})
+    return (
+        f"⚔️ Военная мощь: {stats.get('military', 0)}\n"
+        f"🏭 Экономика: {stats.get('economy', 0)}\n"
+        f"☢️ Ядерные технологии: {stats.get('nuclear_research', 0)}\n"
+        f"🌍 Влияние в Европе: {stats.get('europe_influence', 0)}\n"
+        f"🇺🇸 Отношения с США: {stats.get('us_relations', 0)}"
+    )
+
+
+async def show_final_screen(update, context, outcome_key):
+    final_texts = {
+        "global_war": (
+            "💥 <b>Глобальная катастрофа</b>\n\n"
+            "Мир охвачен ядерной войной. Холодная война перешла в горячую фазу. "
+            "Миллионы жертв. СССР уничтожен.\n\n<b>Игра окончена.</b>"
+        ),
+        "victory": (
+            "🕯️ <b>Март 1953 года. Смерть Сталина</b>\n\n"
+            "Вы прожили судьбоносные годы во главе Советского Союза. "
+            "Холодная война в самом разгаре. Ваши решения определили его лицо.\n\n"
+            "<b>Игра завершена. История запомнит вас таким, каким вы были.</b>"
+        )
+    }
+
+    await update.callback_query.edit_message_text(
+        text=final_texts.get(outcome_key, "Конец игры."),
+        parse_mode='HTML',
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("🔄 Начать заново", callback_data='new_game')],
+            [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+        ])
+    )
 
 
 async def show_welcome(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -869,6 +1072,10 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     logger.error(msg="Exception while handling an update:", exc_info=context.error)
     if update.effective_message:
         await update.effective_message.reply_text("Произошла ошибка. Попробуйте снова.")
+
+def apply_effects(context, effects):
+    for stat, value in effects.items():
+        context.user_data['stats'][stat] = context.user_data['stats'].get(stat, 0) + value
 
 
 def main() -> None:
