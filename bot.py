@@ -662,14 +662,16 @@ async def show_churchill_history(update: Update, context: ContextTypes.DEFAULT_T
         "разделяющем Восточную и Западную Европу. Эта речь стала символическим началом Холодной войны."
     )
 
-    await update.callback_query.edit_message_text(
-        text=text,
-        parse_mode='HTML',
-        reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
-            [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
-        ])
-    )
+    with open("images/fulton_rech.jpg", "rb") as photo:
+        await update.callback_query.message.reply_photo(
+            photo=photo,
+            caption=text,
+            parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
+                [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+            ])
+        )
 
 async def show_churchill_scene(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Показывает сцену с Черчиллем"""
@@ -749,14 +751,16 @@ async def show_potsdam_history(update: Update, context: ContextTypes.DEFAULT_TYP
         "что усилило напряжение между союзниками."
     )
 
-    await update.callback_query.edit_message_text(
-        text=text,
-        parse_mode='HTML',
-        reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
-            [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
-        ])
-    )
+    with open("images/post_konf.jpg", "rb") as photo:
+        await update.callback_query.message.reply_photo(
+            photo=photo,
+            caption=text,
+            parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
+                [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+            ])
+        )
 
 # Скандал
 async def show_spy_scandal(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -825,14 +829,16 @@ async def show_spy_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         "гонку ядерных вооружений и отношения двух сверхдержав."
     )
 
-    await update.callback_query.edit_message_text(
-        text=text,
-        parse_mode='HTML',
-        reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
-            [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
-        ])
-    )
+    with open("images/shpion_skandl.jpg", "rb") as photo:
+        await update.callback_query.message.reply_photo(
+            photo=photo,
+            caption=text,
+            parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
+                [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+            ])
+        )
 
 # Берлин
 async def show_berlin_crisis(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -864,14 +870,16 @@ async def show_berlin_history(update: Update, context: ContextTypes.DEFAULT_TYPE
         "одним из первых острых моментов Холодной войны."
     )
 
-    await update.callback_query.edit_message_text(
-        text=text,
-        parse_mode='HTML',
-        reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
-            [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
-        ])
-    )
+    with open("images/berlin_krizis.jpg", "rb") as photo:
+        await update.callback_query.message.reply_photo(
+            photo=photo,
+            caption=text,
+            parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
+                [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+            ])
+        )
 
 async def handle_berlin_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Обрабатывает выбор в Берлинском кризисе"""
@@ -1051,14 +1059,16 @@ async def show_cuban_history(update: Update, context: ContextTypes.DEFAULT_TYPE)
         "началу политики разрядки международной напряженности."
     )
 
-    await update.callback_query.edit_message_text(
-        text=text,
-        parse_mode='HTML',
-        reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
-            [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
-        ])
-    )
+    with open("images/karib_krizis.jpg", "rb") as photo:
+        await update.callback_query.message.reply_photo(
+            photo=photo,
+            caption=text,
+            parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
+                [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+            ])
+        )
 
 # Испытание
 async def show_rds1_test(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -1129,14 +1139,16 @@ async def show_rds1_history(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         "значительно изменило баланс сил в Холодной войне."
     )
 
-    await update.callback_query.edit_message_text(
-        text=text,
-        parse_mode='HTML',
-        reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
-            [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
-        ])
-    )
+    with open("images/ispt_RDS.jpg", "rb") as photo:
+        await update.callback_query.message.reply_photo(
+            photo=photo,
+            caption=text,
+            parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
+                [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+            ])
+        )
 
 #Венона
 async def show_venona_operation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -1191,14 +1203,16 @@ async def show_venona_history(update: Update, context: ContextTypes.DEFAULT_TYPE
         "Сама операция оставалась засекреченной вплоть до 1995 года."
     )
 
-    await update.callback_query.edit_message_text(
-        text=text,
-        parse_mode='HTML',
-        reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
-            [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
-        ])
-    )
+    with open("images/venona.jpg", "rb") as photo:
+        await update.callback_query.message.reply_photo(
+            photo=photo,
+            caption=text,
+            parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
+                [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+            ])
+        )
 
 #НАТО
 async def show_nato_creation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -1299,14 +1313,16 @@ async def show_tito_history(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         "и показал возможность альтернативных путей социализма вне контроля Москвы."
     )
 
-    await update.callback_query.edit_message_text(
-        text=text,
-        parse_mode='HTML',
-        reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
-            [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
-        ])
-    )
+    with open("images/raskol_tito.jpg", "rb") as photo:
+        await update.callback_query.message.reply_photo(
+            photo=photo,
+            caption=text,
+            parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
+                [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+            ])
+        )
 
 
 #Договор
@@ -1363,7 +1379,16 @@ async def show_history_testban(update: Update, context: ContextTypes.DEFAULT_TYP
         "Подписан СССР, США и Великобританией. Запретил ядерные испытания в атмосфере, в космосе и под водой, "
         "но не под землей. Явился результатом Карибского кризиса и стремления к снижению напряжённости."
     )
-    await update.callback_query.edit_message_text(text=text, parse_mode='HTML', reply_markup=back_to_history_menu())
+    with open("images/dogovor_o_zaprete.jpeg", "rb") as photo:
+        await update.callback_query.message.reply_photo(
+            photo=photo,
+            caption=text,
+            parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
+                [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+            ])
+        )
 
 
 #Стокгольмская конференция
@@ -1417,7 +1442,16 @@ async def show_history_stockholm(update: Update, context: ContextTypes.DEFAULT_T
         "Международная встреча сторонников мира, организованная под эгидой Всемирного совета мира. "
         "СССР использовал её для пропаганды против НАТО и в поддержку ядерного разоружения."
     )
-    await update.callback_query.edit_message_text(text=text, parse_mode='HTML', reply_markup=back_to_history_menu())
+    with open("images/stokgol_konf.jpg", "rb") as photo:
+        await update.callback_query.message.reply_photo(
+            photo=photo,
+            caption=text,
+            parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
+                [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+            ])
+        )
 
 #Венгерское восстание
 
@@ -1472,7 +1506,16 @@ async def show_history_hungary(update: Update, context: ContextTypes.DEFAULT_TYP
         "превратилось в вооружённое восстание. Подавлено советскими войсками. "
         "Вызвало международную критику и ослабление влияния СССР в Восточной Европе."
     )
-    await update.callback_query.edit_message_text(text=text, parse_mode='HTML', reply_markup=back_to_history_menu())
+    with open("images/veng_vosstanie.jpg", "rb") as photo:
+        await update.callback_query.message.reply_photo(
+            photo=photo,
+            caption=text,
+            parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
+                [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+            ])
+        )
 
 #дело_розенбергов
 
@@ -1521,7 +1564,16 @@ async def show_history_rosenbergs(update: Update, context: ContextTypes.DEFAULT_
         "Юлиус и Этель Розенберги были обвинены в передаче СССР секретной информации о ядерной бомбе. "
         "Их казнь вызвала международный резонанс. США усилили меры против советской разведки."
     )
-    await update.callback_query.edit_message_text(text=text, parse_mode='HTML', reply_markup=back_to_history_menu())
+    with open("images/delo_rozenberg.jpg", "rb") as photo:
+        await update.callback_query.message.reply_photo(
+            photo=photo,
+            caption=text,
+            parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
+                [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+            ])
+        )
 
 
 #отставание_в_гонке
@@ -1615,16 +1667,35 @@ async def show_history_albania(update: Update, context: ContextTypes.DEFAULT_TYP
         "После конфликта СССР с Югославией, Албания оказалась между влиянием Москвы и Пекина. "
         "Поддержка СССР ослабла, и Албания начала сближение с Китаем, что предвосхитило будущий советско-китайский разрыв."
     )
-    await update.callback_query.edit_message_text(text=text, parse_mode='HTML', reply_markup=back_to_history_menu())
+    with open("images/allban_raskol.jpg", "rb") as photo:
+        await update.callback_query.message.reply_photo(
+            photo=photo,
+            caption=text,
+            parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("↩️ Назад к справке", callback_data='show_history')],
+                [InlineKeyboardButton("↩️ В главное меню", callback_data='back_to_main')]
+            ])
+        )
 
 async def show_history_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Показывает меню исторических справок"""
     chapter = game_data[99]
-    await update.callback_query.edit_message_text(
-        text=f"<b>{chapter['title']}</b>\n\n{chapter['description']}",
-        parse_mode='HTML',
-        reply_markup=get_choices_keyboard(chapter)
-    )
+    msg = update.callback_query.message
+    if msg.text:
+        await msg.edit_text(
+            text=f"<b>{chapter['title']}</b>\n\n{chapter['description']}",
+            parse_mode='HTML',
+            reply_markup=get_choices_keyboard(chapter)
+        )
+    else:
+        await msg.delete()
+        await update.effective_chat.send_message(
+            text=f"<b>{chapter['title']}</b>\n\n{chapter['description']}",
+            parse_mode='HTML',
+            reply_markup=get_choices_keyboard(chapter)
+        )
+
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Обработчик кнопок"""
@@ -1844,10 +1915,16 @@ async def handle_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Возврат в главное меню"""
-    await update.callback_query.edit_message_text(
-        text="Главное меню:",
-        reply_markup=main_menu_keyboard()
-    )
+    if update.callback_query.message.text:
+        await update.callback_query.edit_message_text(
+            text="Главное меню:",
+            reply_markup=main_menu_keyboard()
+        )
+    else:
+        await update.callback_query.message.chat.send_message(
+            text="Главное меню:",
+            reply_markup=main_menu_keyboard()
+        )
 
 
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
